@@ -1,54 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Development Objectives · Holcim UK</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Reddit+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Reddit Sans', system-ui, sans-serif; background: #f4f6fa; color: #1f2937; -webkit-font-smoothing: antialiased; }
-  html { scroll-behavior: smooth; }
-  textarea, input, button, select { font-family: inherit; }
-  textarea:focus, input:focus, select:focus { outline: none; }
-  button { cursor: pointer; border: none; background: none; }
-  a { color: inherit; text-decoration: none; }
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  .anim-in { animation: fadeIn .3s ease-out both; }
-
-  @page { size: A4; margin: 12mm; }
-  .print-only { display: none; }
-  @media print {
-    html, body, * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    body { background: #fff !important; }
-    .no-print { display: none !important; }
-    .print-only { display: block !important; }
-    .print-area { max-width: 100% !important; }
-    .print-page-break { page-break-after: always; }
-    .objective-print { page-break-inside: avoid; }
-  }
-</style>
-<template id="__bundler_thumbnail">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 56">
-  <rect width="80" height="56" fill="#041739"/>
-  <rect x="14" y="14" width="22" height="28" rx="3" fill="#fff" opacity="0.95"/>
-  <rect x="42" y="14" width="22" height="28" rx="3" fill="#05b7ed" opacity="0.85"/>
-  <rect x="18" y="20" width="14" height="2" rx="1" fill="#041739"/>
-  <rect x="18" y="26" width="10" height="1.5" rx="0.75" fill="#65c12a"/>
-  <rect x="46" y="20" width="14" height="2" rx="1" fill="#fff"/>
-  <rect x="46" y="26" width="10" height="1.5" rx="0.75" fill="#fff" opacity="0.7"/>
-</svg>
-</template>
-</head>
-<body>
-<div id="root"></div>
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script type="text/babel">
 const { useState, useEffect, useMemo, useRef } = React;
 
 const NAVY = '#041739';
@@ -82,6 +31,7 @@ function emptyObjective() {
   return {
     id: 'o_' + Math.random().toString(36).slice(2, 9),
     purpose: '',
+    behaviours: [],
     focus: '',
     evidence: '',
     stretch: '',
@@ -178,8 +128,8 @@ function App() {
     window.scrollTo({ top: 0 });
   };
 
-  const deleteObjective = (id) => {
-    if (!confirm('Delete this objective? You cannot undo this.')) return;
+  const deleteObjective = async (id) => {
+    if (!(await hcDialog({ title: 'Delete this objective?', message: 'This objective will be removed from your plan. You cannot undo this.', confirmLabel: 'Delete objective', cancelLabel: 'Cancel', danger: true }))) return;
     const objectives = plan.objectives.filter(o => o.id !== id);
     if (objectives.length === 0) { update({ objectives: [emptyObjective()] }); setView('welcome'); }
     else update({ objectives });
@@ -192,8 +142,8 @@ function App() {
     window.scrollTo({ top: 0 });
   };
 
-  const resetAll = () => {
-    if (!confirm('Clear all objectives and start fresh?')) return;
+  const resetAll = async () => {
+    if (!(await hcDialog({ title: 'Clear all objectives?', message: 'Every objective in your plan will be removed from this device so you can start fresh. You cannot undo this.', confirmLabel: 'Clear all', cancelLabel: 'Cancel', danger: true }))) return;
     localStorage.removeItem(STORAGE_KEY);
     setPlan(emptyPlan());
     setEditingId(null);
@@ -257,7 +207,7 @@ function Header({ onReset, view, stepIdx, totalSteps }) {
           <img style={{ height: 26, width: 'auto', filter: 'brightness(0) invert(1)' }} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAABFCAYAAADw8dtTAAAPVElEQVR4AeydCbAcVRWG57GvisgiBrBkkUJELGQThEISIQJl3IgCGgtKEgtFLC20XEIShKpYuBE2WcQtRCKRKqNgIghRIhBEQwC3RFzAgAhugBICJH7/ezOpmfdmus/t7ultzqtz3u2+99xzzv2n+3T37Xtvb9Qo8d/69es3hU+HZ8K3wd1oDZnXwefCx5a4Oe6aI+AIpESglAGLwDMRnkfb1sJfg2fAR8PdaHMy3w3PghdTT3Qe/3Zj38kRcARqhECpAhZB5kj4F+D7I/hkOClNp+JD6LoG3oltJ0fAEagBAqUIWASVzeH54Pkz+CA4KzoNRY+heybpwJMD4AhUHYHCAxbB5HWA+AA8Ge4XzcDOtfCL+2XA9ToCjkD/ESg0YBFADqeJd8N7wf2mUzCwApvjSJ0cAUeggggUFrAIHLqzWgJmm8J50Ssw9HNsb0/q5AjUF4GatqyQgEXAUJBaAKZKSXIlBa3Lc7XoxhwBRyATBAoJWHj+A3hPuCiaTND0jvii0He7jkBCBHIPWASK8fh6HFw0qSN+j6KdcPuOgCNgRyD3gIVrX4bLQhqQOtYXz3EEHIFSIpBrwOLu6q2gsD9cFpqCT3uXxRn3wxFwBKIRyDVg4cpZcNloWtkccn8cAUegOwJ5B6wJ3d0oNPfjhVp34wUj4OarhEBuAYtHrw8kBEbzAq2sCdPBZvDtncGVvIIj4AjkjkBuAYuWTYKDaWho6Hwro/x6OAnlMdI+iV9exxFwBNoQyDNgbddmt2ybbyibQ+6PI+AIjEUgZcAaqzAiZ7+IsqKLjinaAbfvCDgC8QjkGbBeEu9OYRLbFmbZDTsCjoAZgTwDltkpFywXAryU2AE+FD6sydNIxa19lfmsgebPBjYbw4fALXymsi28jiVt5R3M9ibNKp4YEfCAZQQqToyDbzPYQhfF6RpdjtKL4ThaN7pemn2MjYN1kknv441G4y703dnkr5KKW/sqexD5dfCZsFbiQCQbQp90kkRTNtaSacGzLeEj4DVoeB5eBrfwuYJt4bWYtJWnZZWeQ/5x+CB4C8oSE/VNZDGAIvlDYqLUc4KxshQ2kQcsyy84QDIcNbvCOqn+SrN1kg2RWkmylyK8HB3Pw69lu9ZEG7eGtdba/2joUljfGCAx0w5IalnwZ9BzKrwx+1WiG9M4S3v1hv4Iqw4PWCNI/WMkGdz/HDhbwPrgx8OgcBiclnTiacHElegtYhmhtP7H1qddJyD0NHwtnAXNRclT6FUQY7MStA/+pglaWhbd3FAPWCNQfX8kGcz/HHC70HIF7dNJsybN1VyLjTK/JQ5qM23R4/8nqPRDOGvaEoV6TOz1lSiK+0+BFo4Hk+CvVFHnDuzo2COxkQesEZx+P5IM3n8OmpfR6kfgreB+0gPYelM/DeShmzbokU9fdfp8n+3pO5xJZ4f02bWu6n/SNbdHJjhqqfLg8Y8esEYADbotHalS/f8cNPoE2qM5tuRWbB6So71MTeG7+ui+idK8xu1dhc2q9APuja+3gI2V7rcKtst5wGo0nh0aGtJbrnZcar/NwaVX6qsKaOgybKd6I1aAzy2T57Chj/aS5EZ6AZKbsZSGxvPb6iIYqQaZ2xBINC7TA1ajoYMQ/LKjimjSY82LCvJV/WUFmU5mlpPsKGr2+zEQEx30H/aq9sGUyAALjmpP4v65QQ9Y6zkgLoMHijho1NEZutSPxmKN5260gwDuVPgJOIS2wocyLJMd4vPCEGFkNX5NfYM7twNG/odgYaljj82edAP1toOf7SlRzoI9+G1/GuGaMIkoji5KFLBwaAhW52O09s5SXVWTcKeWbPfO4oB4IVuVldB2Q4CXGgi5FzjtBN86uh558+AdyX85/BxspUUcQ+oTssoXJoefH8Z4yEd4V4LJxvA4+O/U3UDsXwbrsUlvAzV2a0NZc0PH4xRkqrzk0VFgNubunTy9VQ2NG01YRpKggIVBjebVFUJXD11ZR7QY/vMD7JCEDaqTiqzFHw1yTFq/kvX4DXVLbh1ntQaMtoQfjGssMuq810mtUd5x4q3yia2Nkqef6enf2IIlYLHP2OzOHGTUd7o1uRo0SjJMCmC7Uvbt4b1q//t1u/scdzo2NG6tPTt42xSwMKa5UXPQLkAvIa0DBQXcOjS42QbrmLN1nDi6C2hWi0+QfwapkGWELkS+1MSxvw0OaugHSSytAIOgoRvI663pPWj+E9tbw39juw6kGRM3qyFgqDvpf2s7LccGLIwJUF01y7gee9L2n8aBoQ+5Jq2fpp4ep3UBMDPG9IOTZELWu6tEHczg+l+8/BJsof04vrJsm8VmqMxHjRXW0/ZEcyipdzBcx8njE/h9NcvhW0YMY8V6BiwM6cTSx0Y1iTNWUYUErufg+EaB/irw6wIQwnoMz8plDWeI1QVGn44V6i2gUeBxncqt2m9rbZQ0jX28a/q9opl60onAWnbfC2dCPQMW2jWwq7/f7cNIzqQ3L5Nztlkac1yE3md05otGua5iBDt1HIu7llcs8z1Gf613rkZ1lRBTX3ZWjpoucF0DFgf2L/GiNnO/aIuo6m9e1Ia0/BGjAk3oNYr2FNu3Z0lngSZJd+aUa896R1q14QdZoHxoFkrQMQvWcjsk0TQmYBGsPkmVA+E60b5c9evw5iWv3yT13RF4/8HobNkDlqUZGldlkaubjN4eW+9Ao9qugBVVvqGsI2ARrKZQMhuuC51JQzQe5nekTnYEsrzVb1qtdZLFHWlVAfoujq+Ek9KeXNxMj4MysCFgEaz0tkbrISm/6nwkDdgCIC6H/eQDjEDK867HfLAGtiFPcQ2czdNeaWxxfun3S/R2lEZMoP4fSc20IWBRQ4PjTM/ryAYTAfGJJBxo6EYAEC3l3yD2KQTC1VO8/bjoKRRVwG89Naq8rUxvS9t2K7mpsVqVdDwLpznXNP7uxEBd6nYYM3MiTsfwgcnBpWH0n4sTTln+UuonYarZCOBCpobYlNZL6oPG5pxtlIsSs84i0BU6Sk/RZToZY33gHHpNrFCNBTj3tOpo6wnN0lLNkwz+7YcDFtqtV0NEnVIisIT6mpsWwlGTSVFnpl8ZJbfjBNzZKDtGjLq6UxePKeuSsbxLXpmyLjY6k9UyyUZzpRRTn7HFMb0ES9Tv1wpYF1isuEwmCNzH1ejSEMaqxsSRpCNs6opmnfqhL70kNWjul8CnPyc1klO9J4129m8GaqN4pxh1Q1fP6FRQgj1+Sw0SfX2MK6spT7zC70YApbVpNkOJ02AgYB1uMIljY3ooJNTRhF7r+t79WEM+1OU4+a/ECTTL9dIq0dIpYKZ1r24mbZ8I3VRbrYSgpbv4qKEOuyOjC2eihukO642JanqlfiHQb73HBxg4j5PoXKs8spr4HHKrn9WjrtXFYDlOLs2N1GKHlro7gsG9FsGWDPLCS33IytL3AB8jb3/tVJi/h+/d3s7vBp7d8hG3kQLWQHcW2mCqjxQHzFO0JnJVSMrbaRYnkNYxas8bs43M7WT+C7bSInwxPzpalfZJLmTQ8QFg8SS8e5QvlM+HtdaY7kjbRbVW1n2UaQB3e35ltvld9eZ39AoXV5Ovb12maocC1ttTafDKVUQgdF3yEziB9Kmu+0m18N5upFo+5BJS5ekVdeidugYpZ4odvujLPGm4a9cIJ9p3cFQBmcRE2yL1F/wRK/gsYPtK+F5Y++rr0ZzWqMXsZiO7Gq7k+vdgptH/rX65p9k/A0xSkwJW1x8ptWZXUFoEOHj0sdRFgQ5qmRDdjWtp44eoKx1aRUJ5Oo7IMtP78UEHtLmCUVDzX9Ow+qF6mXpHr4KIfN1l6fFOq4fqhD0AWe0LSzYbjZh/WsX1nwStSTFyZS3Wxyb0kkc4ZOJj6IGWiVFXUjwCBIy34EURfUgKVHOxXSkCL61bX8QHS67BtnXRxVJhit9aBHIX0pCugsg2eMCKhKf2hbpyZ7ISpBEpvR16JQdwqo5Xo63MxfD7Cyg1T9RFNi2p78y6wkZaW5Wo7wGrEj9Tf5zkBNTrdD2mpO4MNXioILUNNvXWzSBeThH816KW5jenKVqhScVnYE+4pVBTr6plD1i6De+JuBekR4ATQv1Re6Kpn48dWoF0K2zpmwCYqjbRDk1j6+fjoe7kTsGOz4cddagoYIW84h5Vve+7lR9I13eEMjDAiaEvCGmp4jdnoG60ionovxCu1clHexRUxtHYrNt1IrrPgfXmFfVO7QgoYA1/2aI9s0TbGqdSInfq7QonyS20UK/RTyZNQ+qr0ie8tBbZ4jSKylwXvB6BhZfamtZVfexie/RpEnFaXbWtr4ClfowkDZzK69Z5Vk5igDrz4KqQrojn42wcJzmBNQQhTq/KMZ+OOGH0vbzr0KJjQyfiZ9m2kNp/EoLHoWMjeDGcVf/LPY1GQ+3rN6sNNCGMaKfaqiERR1DTum4+og114OtbfZui4yI4zds0KzayG8ePImDRl+UNxdctNnVQXoVgEtJ6zroSWznYBj9gUZ/iSuLrC/g73cA3hSpHp9b5itOdaUcwNvXZKp2IF7Ctk1GrL6iDXm8W2/lVtEd3UpsgtwD+MfuZEjrvhuPan0W5Rmgn9h0f74DnwsJLiyBqTFg7VtrW8uObSQaeCd8Ep7Irh9Fhar9k4xhdq2GLPtPSO3H2VI69K+BYm7oSaqqGPuSoemVivzUu0a/BwaSArJUmFrLdzqvYz+pOqkQtTueKMIF/A7djpe3l5Pm6bQnh1R2Wql6tfyVjvT4umUvujiPgCPQfgd4WWgHrSkTKdJW8natQGe/6gMnJEXAEikJgOGARHPRWZ1pRTnSx+7EueZ7lCDgCA47AcMASBgQtPRbepe2CeT6++N1VwT+Cm3cEyojAhoDVdC7zJT+aeq3JnQSrqNUKrXoGWM6b7gjUF4GOgEWwWEVTD4OLII39eFcRht2mI+AIVAOBjoAllwlay0g1XoQkN9Lk26OxnWhN7Ny8dEOOgCNQKAJjApa8IXAsJD0czoP0McUDsZnmc9d5+Ok2HIGyITBw/nQNWEKBAKJJ0VopMGRpWFUN4dnYGQ9rUbeQei7rCDgCA4hAz4AlLAgkD8NHsX02nHr6ADpapCk3r0b3p1oZnjoCjoAjEIdAZMBqVSawzGFba78rcGmdZnYTkZbk2Ad9J8G/TaTBKzkCjsDAImAKWEKHAKPJsHNIj2Ffi+hr6dYZbGvOX7eF2fSFV43tksyR1BNpnZ+y9FXhupMj4AhUCYH/AwAA///TiYDqAAAABklEQVQDAEg7IYs2CV6GAAAAAElFTkSuQmCC" alt="Holcim" style={{ height: 24, filter: 'brightness(0) invert(1)' }} />
           <div>
             <div style={{ fontSize: 10, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 1.6, color: CYAN, textTransform: 'uppercase' }}>Yours, on your device</div>
-            <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 15.5, lineHeight: 1.1, marginTop: 2 }}>Development Objectives</div>
+            <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 15.5, lineHeight: 1.1, marginTop: 2 }}>Development Plan</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -278,7 +228,7 @@ function Header({ onReset, view, stepIdx, totalSteps }) {
 function Footer() {
   return (
     <footer className="no-print" style={{ borderTop: `1px solid ${LINE}`, padding: '24px 32px', textAlign: 'center', fontSize: 12, color: MUTE, fontFamily: 'Reddit Sans' }}>
-      Development Objectives, Holcim UK. Saved only on this device.
+      Development Plan, Holcim UK. Saved only on this device.
     </footer>
   );
 }
@@ -292,18 +242,18 @@ function Welcome({ onStart, hasExisting, onResume }) {
         <div aria-hidden style={{ position: 'absolute', right: -120, bottom: -140, width: 360, height: 360, borderRadius: '50%', background: `radial-gradient(circle, ${CYAN}33, transparent 70%)` }} />
         <div style={{ position: 'relative', maxWidth: 720 }}>
           <div style={{ fontSize: 11, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 2, color: CYAN, textTransform: 'uppercase', marginBottom: 16 }}>A simple way to plan your development</div>
-          <h1 style={{ fontFamily: 'Montserrat', fontWeight: 800, fontSize: 44, lineHeight: 1.06, margin: '0 0 22px', letterSpacing: -1.2 }}>
+          <h1 style={{ fontFamily: 'Montserrat', fontWeight: 800, fontSize: 44, lineHeight: 1.06, margin: '0 0 22px', letterSpacing: -1.2, textTransform: 'uppercase' }}>
             Plan what you want to <Stroke fontSize={44} darkBg>grow.</Stroke>
           </h1>
           <p style={{ fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.85)', maxWidth: 660, margin: '0 0 22px' }}>
             A short tool to think through your development objectives before you put them into SuccessFactors. Six quick steps. Up to three objectives. Print a one-page version for your manager, or copy straight into the system.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <button onClick={onStart} style={{ padding: '13px 22px', borderRadius: 10, background: CYAN, color: NAVY, fontFamily: 'Montserrat', fontWeight: 700, fontSize: 14.5, letterSpacing: 0.3, display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+            <button onClick={onStart} style={{ padding: '13px 22px', borderRadius: 999, background: CYAN, color: NAVY, fontFamily: 'Montserrat', fontWeight: 700, fontSize: 14.5, display: 'inline-flex', alignItems: 'center', gap: 10 , textTransform: 'uppercase', letterSpacing: 0.6 }}>
               Build my first objective <span>→</span>
             </button>
             {hasExisting && (
-              <button onClick={onResume} style={{ padding: '13px 22px', borderRadius: 10, background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', fontFamily: 'Montserrat', fontWeight: 600, fontSize: 14, letterSpacing: 0.3 }}>
+              <button onClick={onResume} style={{ padding: '13px 22px', borderRadius: 999, background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', fontFamily: 'Montserrat', fontWeight: 600, fontSize: 14 , textTransform: 'uppercase', letterSpacing: 0.6 }}>
                 View my plan
               </button>
             )}
@@ -366,7 +316,7 @@ function Builder({ objective, stepIdx, setStepIdx, onChange, onFinish, objective
 function StepShell({ accent, title, lede, onBack, onNext, nextLabel = 'Next', nextDisabled = false, nextHint, children }) {
   return (
     <div>
-      <h2 style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 30, color: NAVY, margin: '0 0 12px', letterSpacing: -0.6, borderLeft: `4px solid ${accent}`, paddingLeft: 14 }}>{title}</h2>
+      <h2 style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 30, color: NAVY, margin: '0 0 12px', letterSpacing: -0.6 }}>{title}</h2>
       <p style={{ fontSize: 15.5, lineHeight: 1.65, color: SLATE, margin: '0 0 26px', maxWidth: 720, paddingLeft: 18 }}>{lede}</p>
       <div>{children}</div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 28, paddingTop: 22, borderTop: `1px solid ${LINE}` }}>
@@ -374,12 +324,12 @@ function StepShell({ accent, title, lede, onBack, onNext, nextLabel = 'Next', ne
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {nextHint && <div style={{ fontSize: 12.5, color: MUTE, fontFamily: 'Reddit Sans' }}>{nextHint}</div>}
           <button onClick={onNext} disabled={nextDisabled} style={{
-            padding: '12px 22px', borderRadius: 10,
+            padding: '12px 22px', borderRadius: 999,
             background: nextDisabled ? '#c5cdda' : NAVY, color: '#fff',
-            fontFamily: 'Montserrat', fontWeight: 700, fontSize: 14, letterSpacing: 0.3,
+            fontFamily: 'Montserrat', fontWeight: 700, fontSize: 14,
             display: 'inline-flex', alignItems: 'center', gap: 10,
             cursor: nextDisabled ? 'not-allowed' : 'pointer',
-          }}>{nextLabel} <span>→</span></button>
+          textTransform: 'uppercase', letterSpacing: 0.6 }}>{nextLabel} <span>→</span></button>
         </div>
       </div>
     </div>
@@ -447,6 +397,18 @@ function ChipRow({ items, onPick }) {
   );
 }
 
+const NEXTGEN_URL = 'https://connect.holcim.com/NextGen-Growth-Behaviors/';
+const NEXTGEN = [
+  { id: 'influence', label: 'Influential Leadership',     hint: 'To achieve excellent results, top performers empower the people who deliver them. Nurturing talent, with a deep sense of purpose, top performers lead by example, combining a clear vision, with the humility to listen. Delivering high impact comes from engaging talent and encouraging innovation.',          show: ['Champion the team', 'Cultivate belonging', 'Inspire with purpose', 'Drive growth', 'Lead through connection'] },
+  { id: 'resilient', label: 'Resilient Drive',            hint: 'The mindset to deliver value, adapting swiftly to market opportunities and changing dynamics. Top performers act with confidence, remaining composed in high-stake situations while focusing on the relentless pursuit of both short and long-term goals.',             show: ['Stay calm', 'Stay target obsessed', 'Never settle', 'Future proof the business', 'Exercise judgment'] },
+  { id: 'growth',    label: 'Growth Mindset',             hint: 'Top performers share an intrinsic motivation for personal and business growth. Actively seeking new opportunities to grow, their self-awareness of strengths and development areas empowers them to proactively take ownership of their own growth and that of their team.', show: ['Practice candor', 'Show courage', 'Admit mistakes', 'Hunt for learning', 'Map blind spots'] },
+  { id: 'strategic', label: 'Strategic Thinking',         hint: 'This is the balance of creative intuition and logical analysis to drive strategic business outcomes. Top performers possess the ability to see the significant details and the big picture simultaneously. Even when faced with ambiguity, they remain decisive—finding creative and efficient solutions while staying highly structured and long-term focused.',      show: ['See both sides', 'Make the call', 'Find Solutions', 'Stay flexible', 'Align with the goal'] },
+  { id: 'integrity', label: 'Performance with Integrity', hint: 'Performance with integrity is the minimum standard, and the foundation of achieving business success. Top performers are role models, acting with integrity to earn trust, build reputation and create value for our people, customers and all stakeholders.',    show: ['Do what is right', 'Own the outcome', 'Hold the line', 'Show radical commitment', 'Operate with candor'] },
+];
+function behaviourLabels(obj) {
+  return (obj.behaviours || []).map(id => (NEXTGEN.find(b => b.id === id) || {}).label).filter(Boolean);
+}
+
 // ── Step 1: Focus ──────────────────────────────────────────────────────────
 const VAGUE = ['leadership', 'communication', 'develop my', 'soft skills', 'strategic thinking', 'influence', 'presence', 'improve'];
 
@@ -463,6 +425,7 @@ function vaguenessNudge(text) {
 }
 
 function FocusStep({ obj, on, next, back, accent }) {
+  const [openNG, setOpenNG] = useState(null);
   const ready = !!obj.purpose && (obj.focus || '').trim().length >= 20;
   const nudge = vaguenessNudge(obj.focus);
   return (
@@ -507,6 +470,44 @@ function FocusStep({ obj, on, next, back, accent }) {
           <strong style={{ fontFamily: 'Montserrat', fontWeight: 700, marginRight: 6 }}>One nudge.</strong>{nudge}
         </div>
       )}
+
+      <div style={{ marginTop: 22 }}>
+        <Label>Which NextGen Growth Behaviour will this build? (optional)</Label>
+        <div style={{ fontSize: 13, color: MUTE, margin: '-2px 0 10px', lineHeight: 1.5 }}>Pick one or two. They appear in your SuccessFactors description. <a href={NEXTGEN_URL} target="_blank" rel="noopener" style={{ color: NAVY }}>About NextGen ↗</a></div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 8 }}>
+          {NEXTGEN.map(b => {
+            const sel = obj.behaviours || [];
+            const active = sel.includes(b.id);
+            const full = !active && sel.length >= 2;
+            const open = openNG === b.id;
+            return (
+              <div key={b.id} style={{ borderRadius: 10, background: active ? LIME : '#fff', border: `1px solid ${active ? LIME : LINE}`, opacity: full ? 0.6 : 1, transition: 'all .12s ease' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button disabled={full} aria-pressed={active}
+                    onClick={() => on({ behaviours: active ? sel.filter(x => x !== b.id) : [...sel, b.id] })}
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', textAlign: 'left', background: 'none', border: 0, color: NAVY, cursor: full ? 'not-allowed' : 'pointer' }}>
+                    <span aria-hidden="true" style={{ width: 18, height: 18, flex: 'none', borderRadius: 5, border: `1.5px solid ${NAVY}`, background: active ? NAVY : '#fff', color: '#fff', fontSize: 12, lineHeight: '15px', textAlign: 'center' }}>{active ? '✓' : ''}</span>
+                    <span style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 13.5 }}>{b.label}</span>
+                  </button>
+                  <button aria-expanded={open} onClick={() => setOpenNG(open ? null : b.id)}
+                    style={{ flex: 'none', marginRight: 10, padding: '5px 10px', background: 'none', border: 0, fontSize: 12.5, color: NAVY, textDecoration: 'underline', textUnderlineOffset: 3, cursor: 'pointer' }}>
+                    {open ? 'Hide' : 'What it means'}
+                  </button>
+                </div>
+                {open && <div style={{ fontSize: 13, color: active ? NAVY : SLATE, lineHeight: 1.5, padding: '0 14px 12px 42px' }}>{b.hint}</div>}
+              </div>
+            );
+          })}
+        </div>
+        {(obj.behaviours || []).length > 0 && (
+          <div style={{ marginTop: 10, background: SOFT, borderRadius: 10, padding: '12px 14px', display: 'grid', gap: 8 }}>
+            <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: NAVY }}>How Holcim’s high performers show up</div>
+            {NEXTGEN.filter(b => obj.behaviours.includes(b.id)).map(b => (
+              <div key={b.id} style={{ fontSize: 13, color: SLATE, lineHeight: 1.5 }}><strong style={{ fontFamily: 'Montserrat', color: NAVY }}>{b.label}:</strong> {b.show.join(' · ')}</div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div style={{ marginTop: 22 }}>
         <Label>What would tell you that you have grown?</Label>
@@ -572,10 +573,15 @@ function PeopleStep({ obj, on, next, back, accent }) {
   return (
     <StepShell accent={accent}
       title="Who can help you?"
-      lede="A few different kinds of person can help, and each one plays a different role. Even one of them by name makes a difference. If you cannot think of anyone, ask your manager."
+      lede="You do not need someone for every role below. One or two people, named, is plenty. Look beyond your own team and function: some of the most useful help comes from people who see your work differently. If you cannot think of anyone, ask your manager who they would suggest."
       onBack={back} onNext={next} nextDisabled={!ready}
       nextHint={ready ? `${named} named so far` : 'Name at least one person'}
     >
+      <div style={{ background: SOFT, borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+        <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 12, letterSpacing: 1, textTransform: 'uppercase', color: NAVY, marginBottom: 6 }}>An example</div>
+        <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.6 }}>A site supervisor wants to lead a small improvement project. Their mentor is a project manager in another region. Their peer is an engineer in a different function who has run a similar project. They leave sponsor blank for now. Two people, neither in their own team.</div>
+        <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.6, marginTop: 8 }}>Or a sales manager who wants to grow their commercial thinking might pick a finance business partner as their thought partner, to help them think through margin and commercial strategy.</div>
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {obj.people.map((p, i) => (
           <PersonRow key={i} person={p} setPerson={(patch) => setPerson(i, patch)} accent={CYAN} />
@@ -588,9 +594,9 @@ function PeopleStep({ obj, on, next, back, accent }) {
 }
 
 const PERSON_DESCRIPTIONS = {
-  'Mentor': 'Someone with experiences or skills you want to learn from. If you do not have one, you can join the Holcim Mentor Programme.',
+  'Mentor': 'Someone with experiences or skills you want to learn from, often from another team, site or function. If you do not have one, you can join the Holcim Mentor Programme.',
   'Sponsor': 'Someone senior who puts your name forward in rooms you are not in. Different from a mentor.',
-  'Peer or thought partner': 'Someone at a similar level you can be honest with and learn alongside.',
+  'Peer or thought partner': 'Someone at a similar level you can be honest with and learn alongside. Someone in a different function often brings the most useful view.',
   'Manager coaching focus': 'What you want your manager to coach you on this year. The name here is your manager.',
   'External mentor or peer': 'Someone outside Holcim you can learn from.',
 };
@@ -598,13 +604,83 @@ const PERSON_DESCRIPTIONS = {
 function PersonRow({ person, setPerson, accent }) {
   const desc = PERSON_DESCRIPTIONS[person.role];
   return (
-    <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderLeft: `3px solid ${accent}`, borderRadius: 10, padding: '16px 18px' }}>
+    <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderTop: `3px solid ${accent}`, borderRadius: 10, padding: '16px 18px' }}>
       <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 12.5, color: NAVY, marginBottom: 4, letterSpacing: 0.3, textTransform: 'uppercase' }}>{person.role}</div>
-      {desc && <div style={{ fontSize: 12.5, color: SLATE, lineHeight: 1.5, marginBottom: 10 }}>{desc}</div>}
+      {desc && <div style={{ fontSize: 12.5, color: SLATE, lineHeight: 1.5, marginBottom: 10 }}>{desc} <span style={{ color: MUTE }}>Optional.</span></div>}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 10 }}>
         <IN value={person.name || ''} onChange={(v) => setPerson({ name: v })} placeholder="Name" />
         <IN value={person.why || ''} onChange={(v) => setPerson({ why: v })} placeholder="Why them, in a few words" />
       </div>
+    </div>
+  );
+}
+
+// ── Explore options (under learning) ───────────────────────────────────────
+const HU_URL = 'https://connect.holcim.com/holcim-university/';
+const HUB_URL = 'https://holcim.gloat.com/path/opportunities/explore';
+const ICONS = {
+  hu: <><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></>,
+  hub: <><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></>,
+  coach: <><path d="M4 4h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M18 9h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></>,
+  person: <><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></>,
+};
+const NEEDS = [
+  { q: 'Build knowledge or a specific skill', recs: [
+    { icon: 'hu', name: 'Holcim University', desc: 'Explore courses, learning pathways and resources to build your knowledge and skills.', how: 'Search for the skill, or browse the pathways for your function and level.', href: HU_URL } ] },
+  { q: 'Get hands-on experience in my current role or a new area', recs: [
+    { icon: 'hub', name: 'CareerHub projects', desc: 'Discover projects, internal opportunities and experiences that help you grow through doing.', how: 'Take on a short project alongside your day job. Agree the time with your manager first.', href: HUB_URL } ] },
+  { q: 'Explore a different role or my next move', recs: [
+    { icon: 'hub', name: 'CareerHub', desc: 'See internal vacancies across Holcim and apply. Keep your profile current so the right roles find you.', how: 'Not ready to apply yet? A project in that area is a good way to test it.', href: HUB_URL } ] },
+  { q: 'Learn from someone who has done it before', recs: [
+    { icon: 'person', name: 'Holcim Mentoring', desc: 'Find a mentor with the experience you want to learn from, often from another team, site or function.', how: 'You will find the mentoring programme in Holcim University.', href: HU_URL } ] },
+  { q: 'Work on confidence, leadership or a career change, with a coach', recs: [
+    { icon: 'coach', name: 'CoachHub', desc: 'Explore professional coaching opportunities, subject to licence availability.', how: 'Coaching works best with a clear goal. Talk to your manager before you request it.', href: HU_URL } ] },
+  { q: 'I am not sure yet', recs: [
+    { icon: 'person', name: 'Start with a conversation', desc: 'Talk to your manager about what you want to grow, and what they have seen you do well. Most good plans start there.', how: 'Career Reflections can help you work out what to say first.', href: null } ] },
+];
+function ExploreOptions() {
+  const [pick, setPick] = useState(null);
+  const need = pick === null ? null : NEEDS[pick];
+  return (
+    <div style={{ marginTop: 28, borderTop: `1px solid ${LINE}`, paddingTop: 20 }}>
+      <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 15, color: NAVY, marginBottom: 4 }}>Not sure where to start? Explore your development options</div>
+      <div style={{ fontSize: 13.5, color: SLATE, marginBottom: 12 }}>What are you looking for?</div>
+      <div role="radiogroup" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8 }}>
+        {NEEDS.map((n, i) => {
+          const on = pick === i;
+          return (
+            <button key={i} role="radio" aria-checked={on} onClick={() => setPick(on ? null : i)} style={{
+              textAlign: 'left', padding: '11px 14px', borderRadius: 10, fontSize: 13.5, lineHeight: 1.4,
+              fontFamily: 'Montserrat', fontWeight: 600, color: on ? '#fff' : NAVY,
+              background: on ? NAVY : '#fff', border: `1px solid ${on ? NAVY : LINE}`, transition: 'all .12s ease',
+            }}
+            onMouseEnter={e => { if (!on) e.currentTarget.style.borderColor = CYAN; }}
+            onMouseLeave={e => { if (!on) e.currentTarget.style.borderColor = LINE; }}>{n.q}</button>
+          );
+        })}
+      </div>
+      {need && (
+        <div aria-live="polite" style={{ marginTop: 12, background: SOFT, borderRadius: 12, padding: '6px 16px' }}>
+          <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: NAVY, padding: '10px 0 2px' }}>Consider</div>
+          {need.recs.map(r => {
+            const Inner = (
+              <>
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginTop: 1 }}>{ICONS[r.icon]}</svg>
+                <div>
+                  <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 15 }}>{r.name}</div>
+                  <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.5, marginTop: 2 }}>{r.desc}</div>
+                  <div style={{ fontSize: 13, color: NAVY, lineHeight: 1.5, marginTop: 6 }}><strong style={{ fontFamily: 'Montserrat' }}>Tip: </strong>{r.how}</div>
+                </div>
+                {r.href ? <span style={{ fontFamily: 'Montserrat', fontWeight: 800, fontSize: 11.5, letterSpacing: 0.6, textTransform: 'uppercase', border: `1.5px solid ${NAVY}`, borderRadius: 999, padding: '6px 12px', whiteSpace: 'nowrap', alignSelf: 'center' }}>Open ↗</span> : <span />}
+              </>
+            );
+            const st = { display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) auto', gap: 12, alignItems: 'start', padding: '12px 0 14px', textDecoration: 'none', color: NAVY };
+            return r.href
+              ? <a key={r.name} href={r.href} target="_blank" rel="noopener" style={st}>{Inner}</a>
+              : <div key={r.name} style={st}>{Inner}</div>;
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -631,10 +707,11 @@ function LearningStep({ obj, on, next, back, accent }) {
         </div>
       ))}
       {obj.learning.length < 2 && (
-        <button onClick={addItem} style={{ marginTop: 6, fontSize: 13, color: NAVY, fontFamily: 'Montserrat', fontWeight: 600, padding: '8px 12px', border: `1px dashed ${LINE}`, borderRadius: 8 }}>
+        <button onClick={addItem} style={{ marginTop: 6, fontSize: 13, color: NAVY, fontFamily: 'Montserrat', fontWeight: 600, padding: '8px 12px', border: `1px dashed ${LINE}`, borderRadius: 999 , whiteSpace: 'nowrap' }}>
           + Add a second item
         </button>
       )}
+      <ExploreOptions />
     </StepShell>
   );
 }
@@ -642,7 +719,7 @@ function LearningStep({ obj, on, next, back, accent }) {
 // ── Step 5: External exposure ──────────────────────────────────────────────
 const EXTERNAL_CHIPS = [
   'Go to a conference', 'Spend a day with a customer', 'Visit another site or company', 'Join an industry group',
-  'Find a mentor outside Holcim', 'Take a short outside course', 'Meet peers from other companies', 'Read up on your market',
+  'Find a mentor outside Holcim', 'Take a short outside course', 'Practise with Gemini or NotebookLM', 'Meet peers from other companies', 'Read up on your market',
 ];
 
 function ExternalStep({ obj, on, next, back, accent }) {
@@ -651,10 +728,15 @@ function ExternalStep({ obj, on, next, back, accent }) {
   return (
     <StepShell accent={accent}
       title="Anything outside Holcim that would help?"
-      lede="Conferences, customer visits, industry groups, a peer from another company. Optional, but a real answer often pays off."
+      lede="Conferences, customer visits, industry groups, a peer from another company, or building your AI skills with Gemini and NotebookLM. Optional, but a real answer often pays off."
       onBack={back} onNext={next} nextHint="Optional, but worth a real answer">
       <div style={{ marginBottom: 10, fontSize: 12, color: MUTE, fontFamily: 'Reddit Sans' }}>Could be:</div>
       <ChipRow items={EXTERNAL_CHIPS} />
+
+      <div style={{ background: SOFT, borderRadius: 10, padding: '14px 16px', margin: '4px 0 18px' }}>
+        <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 12, letterSpacing: 1, textTransform: 'uppercase', color: NAVY, marginBottom: 6 }}>Build your AI skills</div>
+        <div style={{ fontSize: 13.5, color: SLATE, lineHeight: 1.6 }}>You already have Gemini (including Canvas) and NotebookLM in your Holcim Google Workspace account. Using them on a real piece of work, such as researching your market, summarising a report or drafting a proposal, is a practical way to build your AI skills. For structured learning, search for AI courses in Holcim University.</div>
+      </div>
 
       {obj.external.map((it, i) => (
         <div key={i} style={{ marginBottom: 14 }}>
@@ -669,7 +751,7 @@ function ExternalStep({ obj, on, next, back, accent }) {
         </div>
       ))}
       {obj.external.length < 2 && (
-        <button onClick={addItem} style={{ marginTop: 6, fontSize: 13, color: NAVY, fontFamily: 'Montserrat', fontWeight: 600, padding: '8px 12px', border: `1px dashed ${LINE}`, borderRadius: 8 }}>
+        <button onClick={addItem} style={{ marginTop: 6, fontSize: 13, color: NAVY, fontFamily: 'Montserrat', fontWeight: 600, padding: '8px 12px', border: `1px dashed ${LINE}`, borderRadius: 999 , whiteSpace: 'nowrap' }}>
           + Add a second item
         </button>
       )}
@@ -730,7 +812,7 @@ function Summary({ plan, onOwner, onEdit, onDelete, onAdd, canAdd }) {
           <h2 style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 28, color: NAVY, margin: 0, letterSpacing: -0.4 }}>{complete.length} {complete.length === 1 ? 'objective' : 'objectives'} ready.</h2>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => window.print()} style={{ padding: '10px 16px', borderRadius: 8, background: NAVY, color: '#fff', fontFamily: 'Montserrat', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => window.print()} style={{ padding: '10px 16px', borderRadius: 999, background: NAVY, color: '#fff', fontFamily: 'Montserrat', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 8 , textTransform: 'uppercase', letterSpacing: 0.6 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M6 9V2h12v7"/><rect x="4" y="9" width="16" height="9" rx="1"/><rect x="6" y="14" width="12" height="7"/></svg>
             Print or save as PDF
           </button>
@@ -751,7 +833,7 @@ function Summary({ plan, onOwner, onEdit, onDelete, onAdd, canAdd }) {
 
       <div className="no-print" style={{ marginTop: 20, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {canAdd ? (
-          <button onClick={onAdd} style={{ padding: '12px 18px', borderRadius: 10, background: CYAN, color: NAVY, fontFamily: 'Montserrat', fontWeight: 700, fontSize: 13.5, letterSpacing: 0.3, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={onAdd} style={{ padding: '12px 18px', borderRadius: 999, background: CYAN, color: NAVY, fontFamily: 'Montserrat', fontWeight: 700, fontSize: 13.5, display: 'inline-flex', alignItems: 'center', gap: 8 , textTransform: 'uppercase', letterSpacing: 0.6 }}>
             + Add another objective ({complete.length} of {MAX_OBJECTIVES})
           </button>
         ) : (
@@ -762,7 +844,7 @@ function Summary({ plan, onOwner, onEdit, onDelete, onAdd, canAdd }) {
       <div className="no-print" style={{ marginTop: 28, background: PAPER, border: `1px solid ${LINE}`, borderRadius: 12, padding: '20px 22px' }}>
         <div style={{ fontSize: 11, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 1.5, color: NAVY, textTransform: 'uppercase', marginBottom: 10 }}>Ready for SuccessFactors</div>
         <p style={{ fontSize: 14, lineHeight: 1.65, color: SLATE, margin: '0 0 10px' }}>
-          Each objective has a paste-ready panel below it. Copy field by field, or use Copy all fields. Set Category to "Development Objective" and Status to "Not Started" when you create it.
+          Each objective has a paste-ready panel below it, in the same order as the Create Development Objective form in SuccessFactors. In SuccessFactors, open your profile, select Actions, then Development Plan, and create from scratch. Copy field by field, or use Copy all fields. Category, Status and Purpose are drop-downs: pick the values shown.
         </p>
         <p style={{ fontSize: 14, lineHeight: 1.65, color: SLATE, margin: '0 0 16px' }}>
           Want to share with your manager first? Use Print or save as PDF above.
@@ -784,7 +866,7 @@ function PrintHeaderBlock({ plan }) {
     <div className="print-only" style={{ marginBottom: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: `2px solid ${NAVY}`, paddingBottom: 8, marginBottom: 8 }}>
         <div>
-          <div style={{ fontSize: 10, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 1.8, color: NAVY, textTransform: 'uppercase' }}>Development Objectives · Holcim UK</div>
+          <div style={{ fontSize: 10, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 1.8, color: NAVY, textTransform: 'uppercase' }}>Development Plan · Holcim UK</div>
           <div style={{ fontFamily: 'Montserrat', fontWeight: 800, fontSize: 18, color: NAVY, marginTop: 4 }}>{plan.ownerName || 'Your development plan'}</div>
         </div>
         <div style={{ fontSize: 11, color: MUTE, fontFamily: 'Montserrat', fontWeight: 600 }}>
@@ -795,24 +877,54 @@ function PrintHeaderBlock({ plan }) {
   );
 }
 
+function SFPrintTable({ obj, index }) {
+  const purposeLabel = PURPOSE_OPTIONS.find(p => p.id === obj.purpose)?.label || '';
+  const rows = [
+    ['Objective Name', obj.focus || ''],
+    ['Category', 'Development Objective'],
+    ['Objective Description', buildDescription(obj)],
+    ['Start Date', fmtDate(obj.stretchBy)],
+    ['Due Date', fmtDate(obj.reviewDate)],
+    ['Measure of Success', measureFor(obj) || ''],
+    ['Status', 'Not Started'],
+    ['Purpose', purposeLabel],
+  ];
+  return (
+    <div className="print-only sfp">
+      <div className="sfp-h"><span>Create Development Objective</span><span>Objective {index}</span></div>
+      <table><tbody>
+        {rows.map(([k, v]) => (
+          <tr key={k}><th>{k}</th><td>{v || <span className="muted">Not yet written</span>}</td></tr>
+        ))}
+      </tbody></table>
+    </div>
+  );
+}
+
 function ObjectiveCard({ obj, index, onEdit, onDelete }) {
   const purposeLabel = PURPOSE_OPTIONS.find(p => p.id === obj.purpose)?.label || '';
   return (
     <div className="objective-print" style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 14, overflow: 'hidden' }}>
+      <SFPrintTable obj={obj} index={index} />
       {/* Top band */}
-      <div style={{ background: NAVY, color: '#fff', padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+      <div className="ot" style={{ background: NAVY, color: '#fff', padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontSize: 10.5, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 1.5, color: CYAN, textTransform: 'uppercase', marginBottom: 4 }}>Objective {index}  ·  {purposeLabel}</div>
           <div style={{ fontFamily: 'Montserrat', fontWeight: 700, fontSize: 16, lineHeight: 1.3, maxWidth: 700 }}>{obj.focus || 'Untitled objective'}</div>
         </div>
         <div className="no-print" style={{ display: 'flex', gap: 8 }}>
-          <button onClick={onEdit} style={{ fontSize: 12, color: '#fff', fontFamily: 'Montserrat', fontWeight: 600, padding: '6px 12px', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 6 }}>Edit</button>
-          <button onClick={onDelete} style={{ fontSize: 12, color: '#fca5a5', fontFamily: 'Montserrat', fontWeight: 600, padding: '6px 12px', border: '1px solid rgba(252,165,165,0.4)', borderRadius: 6 }}>Delete</button>
+          <button onClick={onEdit} style={{ fontSize: 12, color: '#fff', fontFamily: 'Montserrat', fontWeight: 600, padding: '6px 12px', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 999 , whiteSpace: 'nowrap' }}>Edit</button>
+          <button onClick={onDelete} style={{ fontSize: 12, color: '#fca5a5', fontFamily: 'Montserrat', fontWeight: 600, padding: '6px 12px', border: '1px solid rgba(252,165,165,0.4)', borderRadius: 999 , whiteSpace: 'nowrap' }}>Delete</button>
         </div>
       </div>
 
       {/* Body */}
-      <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div className="ob" style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {behaviourLabels(obj).length > 0 && (
+          <SectionBlock accent={LIME} label="NextGen Growth Behaviours">
+            <div style={{ fontSize: 14, lineHeight: 1.6, color: '#1f2937' }}>{behaviourLabels(obj).join(', ')}</div>
+          </SectionBlock>
+        )}
         <SectionBlock accent={LIME} label="Growth this would show">
           <div style={{ fontSize: 14, lineHeight: 1.6, color: '#1f2937' }}>{obj.evidence || <Muted>Not yet written</Muted>}</div>
         </SectionBlock>
@@ -888,7 +1000,7 @@ function measureFor(obj) {
 
 function SectionBlock({ accent, label, date, dateLabel, children }) {
   return (
-    <div style={{ borderLeft: `3px solid ${accent}`, paddingLeft: 14 }}>
+    <div className="sb" style={{ borderTop: `3px solid ${accent}`, paddingTop: 12 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
         <div style={{ fontSize: 10.5, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 1, color: accent, textTransform: 'uppercase' }}>{label}</div>
         {date && (
@@ -900,7 +1012,7 @@ function SectionBlock({ accent, label, date, dateLabel, children }) {
   );
 }
 
-function Muted({ children }) { return <span style={{ color: MUTE, fontStyle: 'italic' }}>{children}</span>; }
+function Muted({ children }) { return <span className="muted" style={{ color: MUTE, fontStyle: 'italic' }}>{children}</span>; }
 
 function fmtDate(iso) {
   if (!iso) return '';
@@ -910,6 +1022,11 @@ function fmtDate(iso) {
 // ── Build the SuccessFactors description block ─────────────────────────────
 function buildDescription(obj) {
   const lines = [];
+  const ng = behaviourLabels(obj);
+  if (ng.length) {
+    lines.push(`NextGen Growth Behaviours: ${ng.join(', ')}.`);
+    lines.push('');
+  }
   if (obj.stretch) {
     lines.push('Stretch and experience.');
     lines.push(obj.stretch);
@@ -950,7 +1067,6 @@ function SuccessFactorsExport({ obj, index }) {
   const measure = measureFor(obj);
 
   const fields = [
-    { key: 'purpose',     label: 'Purpose',               value: purposeLabel,                 limit: null },
     { key: 'name',        label: 'Objective Name',        value: obj.focus || '',              limit: CAP_NAME },
     { key: 'category',    label: 'Category',              value: 'Development Objective',      limit: null },
     { key: 'description', label: 'Objective Description', value: description,                  limit: CAP_DESC, multi: true },
@@ -958,6 +1074,7 @@ function SuccessFactorsExport({ obj, index }) {
     { key: 'dueDate',     label: 'Due Date',              value: fmtDate(obj.reviewDate),      limit: null },
     { key: 'measure',     label: 'Measure of Success',    value: measure || '',                limit: CAP_MEASURE, multi: true },
     { key: 'status',      label: 'Status',                value: 'Not Started',                limit: null },
+    { key: 'purpose',     label: 'Purpose',               value: purposeLabel,                 limit: null },
   ];
 
   return (
@@ -994,12 +1111,12 @@ function FieldRow({ field }) {
             <div style={{ fontSize: 10.5, fontFamily: 'Montserrat', fontWeight: 600, color: over ? '#b91c1c' : MUTE }}>{(field.value || '').length}/{field.limit}</div>
           )}
           <button onClick={doCopy} disabled={empty} style={{
-            fontSize: 11.5, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 0.3,
-            padding: '5px 10px', borderRadius: 6,
+            fontSize: 11.5, fontFamily: 'Montserrat', fontWeight: 700,
+            padding: '5px 10px', borderRadius: 999,
             background: copied ? LIME : (empty ? '#e5e7eb' : NAVY),
             color: copied ? '#fff' : (empty ? MUTE : '#fff'),
             cursor: empty ? 'not-allowed' : 'pointer',
-          }}>{copied ? 'Copied' : 'Copy'}</button>
+          textTransform: 'uppercase', letterSpacing: 0.6 }}>{copied ? 'Copied' : 'Copy'}</button>
         </div>
       </div>
       <div style={{ fontSize: 12.5, lineHeight: 1.5, color: empty ? MUTE : '#1f2937', whiteSpace: field.multi ? 'pre-wrap' : 'normal', fontStyle: empty ? 'italic' : 'normal' }}>
@@ -1021,19 +1138,10 @@ function CopyAllButton({ fields, index }) {
   };
   return (
     <button onClick={doCopy} style={{
-      fontSize: 12, fontFamily: 'Montserrat', fontWeight: 700, letterSpacing: 0.3,
-      padding: '6px 12px', borderRadius: 6, background: copied ? LIME : CYAN, color: NAVY,
-    }}>{copied ? 'Copied all fields' : 'Copy all fields'}</button>
+      fontSize: 12, fontFamily: 'Montserrat', fontWeight: 700,
+      padding: '6px 12px', borderRadius: 999, background: copied ? LIME : CYAN, color: NAVY,
+    textTransform: 'uppercase', letterSpacing: 0.6 }}>{copied ? 'Copied all fields' : 'Copy all fields'}</button>
   );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-</script>
-<script>(function(){
-if(!/script\.google|googleusercontent/.test(location.hostname))return;
-var M={"Home.html":"home","https://connect.holcim.com/NextGen-Growth-Behaviors/" target="_blank" rel="noopener":"nextgen-behaviours","Your Career Tools.html":"colleagues","Holcim Career Reflections.html":"career-reflections","Development Plan.html":"development-plan","For Colleagues in Scope.html":"in-scope","Prepare Your Profile.html":"prepare-your-profile","Colleague Guide.html":"colleague-guide","For Managers.html":"managers","Manager Guide.html":"manager-guide","Manager Career Conversation Kit.html":"career-conversation-kit","4A Assessment.html":"4a-assessment","Holcim Potential Workshop.html":"potential-workshop","Conversation Cards.html":"conversation-cards","Evidence Challenge Trainer.html":"evidence-trainer","For the People Team.html":"people-team","Holcim People Team Guide.html":"people-team-guide","Talent Review Facilitation Guide.html":"facilitation-guide","For ExCo.html":"exco"};
-var BASE="<?!= BASE ?>"||location.href.split("?")[0];
-function fix(){var as=document.querySelectorAll('a[href]');for(var i=0;i<as.length;i++){var a=as[i],h=a.getAttribute("href");if(!h||/^(https?:|mailto:|#|javascript:)/.test(h))continue;var parts=h.split("#"),name=decodeURIComponent(parts[0]),slug=M[name];if(!slug)continue;a.setAttribute("href",BASE+"?page="+slug+(parts[1]?"#"+parts[1]:""));a.setAttribute("target","_top");}}
-fix();new MutationObserver(fix).observe(document.documentElement,{childList:true,subtree:true});
-})();</script><a href="Your Career Tools.html" class="om-home">⌂ Career tools</a><style>.om-home{position:fixed;right:18px;bottom:18px;z-index:99999;display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:#041739;color:#fff!important;font-family:Montserrat,system-ui,sans-serif;font-weight:700;font-size:13px;letter-spacing:.4px;white-space:nowrap;text-decoration:none;box-shadow:0 4px 16px rgba(4,23,57,.3);border:1px solid rgba(255,255,255,.2)}.om-home:hover{background:#164375;color:#fff!important}@media print{.om-home{display:none!important}}</style></body>
-</html>
